@@ -14,31 +14,34 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+      ignoreEnvFile: process.env.NODE_ENV === 'production', // ignore .env khi prod
     }),
 
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         const isProd = process.env.NODE_ENV === 'production';
-
-        return isProd
-          ? {
-              type: 'postgres',
-              url: process.env.DATABASE_URL, // Railway connection string
-              ssl: { rejectUnauthorized: false },
-              autoLoadEntities: true,
-              synchronize: true, // ⚠️ chỉ test thôi
-            }
-          : {
-              type: 'postgres',
-              host: process.env.DB_HOST || 'localhost',
-              port: parseInt(process.env.DB_PORT || '5435'),
-              username: process.env.DB_USERNAME || 'residents',
-              password: process.env.DB_PASSWORD || 'postgres',
-              database: process.env.DB_NAME || 'residents-management',
-              autoLoadEntities: true,
-              synchronize: true,
-            };
+        if (isProd) {
+          console.log('Connecting to PROD DB:', process.env.DATABASE_URL);
+          return {
+            type: 'postgres',
+            url: process.env.DATABASE_URL,
+            ssl: { rejectUnauthorized: false }, // Railway yêu cầu SSL
+            autoLoadEntities: true,
+            synchronize: false,
+          };
+        } else {
+          console.log('Connecting to LOCAL DB');
+          return {
+            type: 'postgres',
+            host: process.env.DB_HOST || 'localhost',
+            port: parseInt(process.env.DB_PORT || '5435'),
+            username: process.env.DB_USERNAME || 'residents',
+            password: process.env.DB_PASSWORD || 'postgres',
+            database: process.env.DB_NAME || 'residents-management',
+            autoLoadEntities: true,
+            synchronize: true,
+          };
+        }
       },
     }),
 
