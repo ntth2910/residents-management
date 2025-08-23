@@ -1,18 +1,11 @@
-version: '3.8'
-
 services:
   api:
     build: .
     container_name: residents-management_api
     ports:
       - "3000:3000"
-    environment:
-      DATABASE_HOST: postgres
-      DATABASE_PORT: 5432
-      DATABASE_USER: residents
-      DATABASE_PASSWORD: postgres
-      DATABASE_NAME: residents-management
-      JWT_SECRET: mysecretsecret
+    env_file:
+      - .env  # local dev
     depends_on:
       - postgres
     networks:
