@@ -19,12 +19,16 @@ import { ConfigModule } from '@nestjs/config';
 
     TypeOrmModule.forRootAsync({
       useFactory: () => {
+        console.log('Connecting to PROD DB:', process.env.DATABASE_PUBLIC_URL);
         const isProd = process.env.NODE_ENV === 'production';
         if (isProd) {
-          console.log('Connecting to PROD DB:', process.env.DATABASE_URL);
+          console.log(
+            'Connecting to PROD DB:',
+            process.env.DATABASE_PUBLIC_URL,
+          );
           return {
             type: 'postgres',
-            url: process.env.DATABASE_URL,
+            url: process.env.DATABASE_PUBLIC_URL,
             ssl: { rejectUnauthorized: false }, // Railway yêu cầu SSL
             autoLoadEntities: true,
             synchronize: false,
