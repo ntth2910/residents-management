@@ -1,47 +1,47 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BuildingsModule } from './modules/buildings/buildings.module';
 import { ResidentsModule } from './modules/residents/residents.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UnitsModule } from './modules/units/units.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
-import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      ignoreEnvFile: process.env.NODE_ENV === 'production', // ignore .env khi prod
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
 
     TypeOrmModule.forRootAsync({
       useFactory: () => {
-        console.log('Connecting to PROD DB:', process.env.DATABASE_PUBLIC_URL);
         const isProd = process.env.NODE_ENV === 'production';
+        console.log('NODE_ENV:', process.env.NODE_ENV);
+        console.log('DATABASE_URL (internal):', process.env.DATABASE_URL);
+        console.log('DATABASE_PUBLIC_URL:', process.env.DATABASE_PUBLIC_URL);
+
         if (isProd) {
-          console.log(
-            'Connecting to PROD DB:',
-            process.env.DATABASE_PUBLIC_URL,
-          );
+          const dbUrl = process.env.DATABASE_URL;
+          if (!dbUrl) throw new Error('DATABASE_URL not defined!');
           return {
             type: 'postgres',
-            url: process.env.DATABASE_PUBLIC_URL,
-            ssl: { rejectUnauthorized: false }, // Railway yêu cầu SSL
+            url: dbUrl,
+            ssl: { rejectUnauthorized: false },
             autoLoadEntities: true,
-            synchronize: false,
+            synchronize: true, // prod: false nếu không muốn auto sync
           };
-        } else {
-          console.log('Connecting to LOCAL DB');
+        }  else {
           return {
             type: 'postgres',
-            host: process.env.DB_HOST || 'localhost',
-            port: parseInt(process.env.DB_PORT || '5435'),
-            username: process.env.DB_USERNAME || 'residents',
-            password: process.env.DB_PASSWORD || 'postgres',
-            database: process.env.DB_NAME || 'residents-management',
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432'),
+            username: process.env.DB_USERNAME,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
             autoLoadEntities: true,
             synchronize: true,
           };
