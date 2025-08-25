@@ -96,3 +96,62 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+
+
+
+📌 Problems & Solutions
+
+Current issues
+
+Scattered management (Zalo, Excel).
+
+Missing/inconsistent data.
+
+No standardized ticket workflow.
+
+No security/roles.
+
+Proposed solution
+
+Centralized NestJS + PostgreSQL backend.
+
+REST API with Swagger docs.
+
+JWT Auth + Roles (admin, staff).
+
+Modular design for future extensions.
+
+📦 Modules & Entities
+
+Users: authentication, roles (admin, staff).
+
+Buildings: apartment buildings.
+
+Units: apartments inside buildings.
+
+Residents: people living in units.
+
+Tickets: complaints/requests linked to residents & units.
+
+Relationships
+
+Building → Units
+
+Unit → Residents
+
+Resident → Tickets
+
+Unit → Tickets
+
+⚙️ Tech Stack
+
+Backend: NestJS (TypeScript).
+
+Database: PostgreSQL (Docker).
+
+ORM: TypeORM.
+
+Auth: JWT + Guards + Role decorator.
+
+Docs: Swagger (OpenAPI).
